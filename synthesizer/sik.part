@@ -1,0 +1,65 @@
+instr sik
+
+iSwing random 0, 1
+
+if iSwing > .5 then
+
+aLeft, aRight subinstr "_sik"
+
+aLeft clip aLeft, 1, 0dbfs
+aRight clip aRight, 1, 0dbfs
+
+iDistance init 1.5
+
+chnmix aLeft / iDistance, "left"
+chnmix aRight / iDistance, "right"
+
+endif
+
+endin
+
+instr _sik
+
+iPitch random 0, 1
+iPitch += 1
+
+iAttack init 1 / 2^8
+iDecay init iAttack
+
+p3 init iAttack + iDecay
+
+aMainSubAmplitude linseg 0, iAttack, 1, iDecay, 0
+aMainSubFrequency linseg cpsoct ( 12 + iPitch ), iAttack, cpsoct ( 8 + iPitch )
+
+aMainSub poscil aMainSubAmplitude, aMainSubFrequency
+
+iMainSub init 1
+
+outs aMainSub / iMainSub, aMainSub / iMainSub
+
+aHighSubAmplitude linseg 0, iAttack/8, 1, iDecay/8, 0
+aHighSubFrequency linseg cpsoct ( 13 + iPitch ), iAttack/2, cpsoct ( 10 + iPitch )
+
+aHighSub poscil aHighSubAmplitude, aHighSubFrequency
+
+iHighSub init 1
+
+outs aHighSub / iHighSub, aHighSub / iHighSub
+
+aGogobell gogobel 1, cpsoct ( 6 + iPitch ), .75, .75, giStrikeFT, 6.0, 0.3, giVibratoFT
+
+iGogobell init 4
+
+outs aGogobell / iGogobell, aGogobell / iGogobell
+
+aSnatchAmplitude linseg 0, iAttack/8, 1, iDecay/8, 0
+aSnatchFrequency linseg cpsoct ( 13 + iPitch ), iAttack/2, cpsoct ( 11 + iPitch )
+
+aSnatch noise aSnatchAmplitude, 0
+aSnatch butterlp aSnatch, aSnatchFrequency
+
+iSnatch init 1
+
+outs aSnatch / iSnatch, aSnatch / iSnatch
+
+endin
