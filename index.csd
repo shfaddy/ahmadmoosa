@@ -4,6 +4,8 @@
 
 -odac
 
+--smacro:score=.sco
+
 </CsOptions>
 
 <CsInstruments>
@@ -16,7 +18,7 @@
 
 <CsScore>
 
-#include "index.sco"
+#includestr "$score"
 
 </CsScore>
 

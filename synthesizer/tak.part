@@ -5,10 +5,8 @@ aLeft, aRight subinstr "_tak"
 aLeft clip aLeft, 1, 0dbfs
 aRight clip aRight, 1, 0dbfs
 
-iDistance init 1.5
-
-chnmix aLeft / iDistance, "left"
-chnmix aRight / iDistance, "right"
+chnmix aLeft / p4, "left"
+chnmix aRight / p4, "right"
 
 endin
 

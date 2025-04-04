@@ -8,10 +8,8 @@ aNote subinstr "_sagat"
 
 aNote clip aNote, 1, 0dbfs
 
-aNote /= 2
-
-chnmix aNote, "left"
-chnmix aNote, "right"
+chnmix aNote / p4, "left"
+chnmix aNote / p4, "right"
 
 endif
 
