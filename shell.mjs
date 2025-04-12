@@ -6,7 +6,7 @@ import { writeFile } from 'node:fs/promises';
 import { spawn } from 'node:child_process';
 import { parse } from 'node:path';
 
-await Scenarist ( new class extends AhmadMoosa {
+Scenarist ( new class extends AhmadMoosa {
 
 $project = '';
 $directory = parse ( new URL ( import .meta .url ) .pathname ) .dir
@@ -16,8 +16,11 @@ async $_producer ( ... argv ) {
 this .shell = createInterface ( { input, output } )
 .on ( 'line',
 
-line => this .process ( ... line .trim () .split ( /\s+/ ) )
-.finally ( () => {
+line => Promise .resolve (
+
+this .$ ( Symbol .for ( 'process' ), ... line .trim () .split ( /\s+/ ) )
+
+) .finally ( () => {
 
 if ( ! this .synthesizer )
 this .shell .prompt ();
@@ -42,7 +45,7 @@ this .shell .write ( argv .join ( ' ' ) + '\n' );
 
 };
 
-async process ( ... argv ) {
+async $_process ( ... argv ) {
 
 if ( this .synthesizer )
 return;
@@ -85,7 +88,7 @@ instrument => `--omacro:${ instrument .slice ( 1 ) }=${ this .$mix [ instrument 
 
 ], {
 
-//stdio: 'inherit'
+stdio: 'inherit'
 
 } );
 
@@ -105,4 +108,4 @@ return resolve ( "Okay" )
 
 };
 
-}, ... process .argv .slice ( 2 ) );
+} ) ( Symbol .for ( 'producer' ), ... process .argv .slice ( 2 ) );

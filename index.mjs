@@ -1,4 +1,8 @@
+import Tarabaiza from './tarabaiza.mjs';
+
 export default class AhmadMoosa extends Array {
+
+$tarabaiza = new Tarabaiza;
 
 $tempo = 112.5;
 $measure = 4;

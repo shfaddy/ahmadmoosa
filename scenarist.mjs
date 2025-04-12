@@ -1,94 +1,77 @@
-/*
-
-# Source Code of Scenarist
-
-Scenarist is written here as an ECMAScript Module.
-
-*/
-
-export default ( ... argv ) => new Scenarist ( ... argv ) .get ();
-
-/*
-
-The module's default export is a function that instructs Scenarist to write a play for the input scenario.
-The scenario must be an object.
-The returned play is a function.
-
-*/
+export default ( ... argv ) => new Scenarist ( ... argv ) .play;
 
 class Scenarist {
 
-#play = Scenarist .#director .bind ( this );
-#scenario;
-#plot = new Map;
-#ready;
-#argv = [];
+constructor ( scenario, player = this ) {
 
-constructor ( ... argv ) {
+this .play = new Proxy ( typeof ( this .scenario = scenario ) === 'function' ? scenario : function Scenarist () {}, this );
+this .player = player;
 
-if ( typeof ( this .#scenario = argv .shift () ) !== 'object' )
-throw TypeError ( `Scenarist writes plays only for object scenarios. Passed scenario is ${ typeof this .#scenario }.` );
+if ( typeof this .scenario === 'object' )
+Object .defineProperty ( this .scenario, '$', { value: this .play } );
 
-if ( typeof Object .assign ( this .#scenario, { $: this .#play } ) .$_producer === 'function' )
-this .#ready = this .#play ( Symbol .for ( 'producer' ), ... ( this .#argv = argv ) );
+};
 
-}; // Scenarist .prototype .constructor
+apply ( scenario, _, argv ) {
 
-async get () {
+if ( scenario === this .scenario )
+return Reflect .apply ( this .scenario, this .player .scenario, argv );
 
-await this .#ready;
+if ( ! argv .length )
+return typeof this .scenario === 'object' ? this .play : this .scenario;
 
-return this .#play;
+const cue = argv .shift ();
+let resolution = this .play [ cue ];
 
-}; // Scenarist .prototype .get
+if ( typeof resolution === 'function' )
+return resolution ( ... argv );
 
-static async #director ( ... argv ) {
+if ( argv .length )
+resolution = this .play [ cue ] = argv .shift ();
 
-let direction = typeof argv [ 0 ] === 'symbol' ? '$_' + Symbol .keyFor ( argv [ 0 ] ) : '$' + argv [ 0 ];
-let conflict = this .#scenario [ direction ];
+return argv .length ? this .play ( ... argv ) : resolution;
+
+};
+
+plot = new Map;
+
+get ( _, cue, __, ... argv ) {
+
+let direction = typeof cue === 'symbol' ? '$_' + Symbol .keyFor ( cue ) : '$' + cue;
+let conflict = this .scenario [ direction ] = argv .length ? argv .shift () : this .scenario [ direction ];
 let resolution;
-
-if ( conflict === undefined )
-conflict = this .#scenario [ direction = '$_director' ];
-
-else
-argv .shift ();
 
 switch ( typeof conflict ) {
 
 case 'object':
+case 'function':
 
-if ( ! this .#plot .has ( conflict ) ) {
+if ( ! this .plot .has ( conflict ) ) {
 
-const scenarist = new this .constructor ( conflict, ... this .#argv );
+const scenarist = new this .constructor ( conflict, this );
 
-await scenarist .#ready;
-
-this .#plot .set ( conflict, scenarist );
+this .plot .set ( conflict, scenarist );
 
 }
 
-resolution = this .#plot .get ( conflict ) .#play ( ... argv );
-
-break;
-
-case 'function':
-
-resolution = conflict .call ( this .#scenario, ... argv );
+resolution = this .plot .get ( conflict ) .play;
 
 break;
 
 default:
 
-if ( argv .length && ! direction .startsWith ( '$_' ) )
-conflict = this .#scenario [ direction ] = isNaN ( argv [ 0 ] ) ? argv .shift () : parseFloat ( argv .shift () );
-
 resolution = conflict;
 
 }
 
-return ! direction .startsWith ( '$_' ) && typeof this .#scenario .$_reversal === 'function' ? await this .#play ( Symbol .for ( 'reversal' ), direction, await resolution ) : await resolution;
+return resolution;
 
-}; // Scenarist .#director
+};
+
+set ( _, cue, argv, __ ) {
+
+return this .get ( _, cue, __, isNaN ( argv ) ? argv : parseFloat ( argv ) );
+
+};
 
 }; // Scenarist
