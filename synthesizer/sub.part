@@ -1,0 +1,20 @@
+instr sub
+
+$parameters
+
+p3 init iAttack + iDecay + iRelease
+
+iDetune random 0, 12
+
+iNote init iKey + iDetune
+
+aAmplitude linseg 0, iAttack, 1, iDecay, iSustain, iRelease, 0
+
+aFrequency linseg cpsmidinn ( iNote + iShift ), iAttack / iSweep, cpsmidinn ( iNote )
+
+aNote poscil aAmplitude, aFrequency
+
+chnmix aNote * p5, "left"
+chnmix aNote * p6, "right"
+
+endin

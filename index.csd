@@ -12,7 +12,6 @@
 
 #include "synthesizer/header.part"
 #include "synthesizer/output.part"
-#include "synthesizer/note.part"
 
 </CsInstruments>
 

@@ -10,6 +10,9 @@ this .player = player;
 if ( typeof this .scenario === 'object' )
 Object .defineProperty ( this .scenario, '$', { value: this .play } );
 
+if ( typeof this .scenario ?.$_producer === 'function' )
+this .play ( Symbol .for ( 'producer' ) );
+
 };
 
 apply ( scenario, _, argv ) {
@@ -18,15 +21,18 @@ if ( scenario === this .scenario )
 return Reflect .apply ( this .scenario, this .player .scenario, argv );
 
 if ( ! argv .length )
-return typeof this .scenario === 'object' ? this .play : this .scenario;
+return typeof this .scenario === 'object' ? this .play ( Symbol .for ( 'director' ) ) : this .scenario;
 
 const cue = argv .shift ();
 let resolution = this .play [ cue ];
 
+if ( resolution === undefined )
+return cue !== Symbol .for ( 'director' ) ? this .play ( Symbol .for ( 'director' ), cue, ... argv ) : resolution;
+
 if ( typeof resolution === 'function' )
 return resolution ( ... argv );
 
-if ( argv .length )
+if ( resolution !== undefined && argv .length )
 resolution = this .play [ cue ] = argv .shift ();
 
 return argv .length ? this .play ( ... argv ) : resolution;
@@ -38,7 +44,11 @@ plot = new Map;
 get ( _, cue, __, ... argv ) {
 
 let direction = typeof cue === 'symbol' ? '$_' + Symbol .keyFor ( cue ) : '$' + cue;
-let conflict = this .scenario [ direction ] = argv .length ? argv .shift () : this .scenario [ direction ];
+
+if ( argv .length )
+this .scenario [ direction ] = argv .shift ();
+
+let conflict = this .scenario [ direction ];
 let resolution;
 
 switch ( typeof conflict ) {
