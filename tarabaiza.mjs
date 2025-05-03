@@ -1,43 +1,26 @@
-import Orchestra from './orchestra.mjs';
-import File from './file.mjs';
-import Kit from './kit.mjs';
+import Nota from './nota.mjs';
+import Setup from './setup.mjs';
+import Clock from './clock.mjs';
 
-export default class Tarabaiza extends Map {
+export default class Tarabaiza extends Nota {
 
-$orchestra = new Orchestra;
+constructor ( details ) {
 
-$file = new File;
+super ( details );
 
-$_producer () {
-
-this .$ .kit = 'shfaddys';
-
-};
-
-get $kit () {
-
-return this .kit;
+this .$setup = details ?.setup || new Setup;
+this .$clock = details ?.clock || new Clock;
 
 };
 
-set $kit ( kit ) {
+$options ( $ ) {
 
-if ( ! this .has ( kit ) )
-this .set ( kit, new Kit ( this .$orchestra ) );
-
-return this .$_director = this .get ( this .kit = kit );
-
-};
-
-$options () {
-
-const { $ } = this;
 const options = [];
 const output = [];
 const sample = [];
-const file = $ ( 'file' );
-const format = $ .sample ( 'format' );
-const type = $ .sample ( 'type' );
+const file = $ ( 'title' ) || 'dac';
+const format = $ .setup ( 'format' );
+const type = $ .setup ( 'type' );
 
 if ( file !== undefined )
 output .push ( file );
@@ -64,9 +47,7 @@ return options .join ( '\n' );
 
 };
 
-$document () {
-
-const { $ } = this;
+$document ( $ ) {
 
 return [
 
@@ -80,7 +61,7 @@ $ ( 'options' ),
 
 '<CsInstruments>',
 
-... $ ( 'orchestra' ),
+... $ ( 'setup' ),
 
 '</CsInstruments>',
 

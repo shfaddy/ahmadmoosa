@@ -37,8 +37,6 @@ const score = [];
 
 for ( const [ phone ] of this ) {
 
-console .log ( '#phone/score', phone );
-
 $ .phone = phone;
 
 const note = $ [ Symbol .for ( 'director' ) ] .note ( ... argv );

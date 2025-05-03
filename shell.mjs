@@ -15,28 +15,30 @@ $directory = parse ( new URL ( import .meta .url ) .pathname ) .dir
 
 constructor ( ... argv ) { this .argv = argv };
 
-async $_producer () {
+async $_producer ( $ ) {
 
 const { argv } = this;
 
-this .shell = createInterface ( { input, output } )
-.on ( 'line', line => this .$ ( Symbol .for ( 'process' ), line ) )
-.on ( 'SIGINT', () => this .$ ( Symbol .for ( 'interrupt' ) ) );
+this .processor = $;
 
-this .shell .prompt ();
+this .shell = createInterface ( { input, output } )
+.on ( 'line', line => $ ( Symbol .for ( 'process' ), line ) )
+.on ( 'SIGINT', () => $ ( Symbol .for ( 'interrupt' ) ) );
+
+this .prompt ();
 
 if ( argv .length )
-this .shell .write ( argv .join ( ' ' ) + '\n' );
+$ [ Symbol .for ( 'enter' ) ] ( ... argv );
 
 };
 
-async $_enter ( line ) {
+async $_enter ( $, ... argv ) {
 
 await new Promise ( resolve => {
 
 this .resolve = resolve;
 
-this .shell .write ( line + '\n' );
+this .shell .write ( argv .join ( ' ' ) + '\n' );
 
 } );
 
@@ -44,7 +46,7 @@ delete this .resolve;
 
 };
 
-async $_process ( line ) {
+async $_process ( $, line ) {
 
 if ( this .synthesizer )
 return false;
@@ -52,11 +54,36 @@ return false;
 try {
 
 const argv = line .trim () .split ( /\s+/ );
+const resolution = await this .processor ( ... argv );
 
-const resolution = await this .$ ( ... argv );
+switch ( typeof resolution ) {
 
-if ( resolution !== undefined )
-console .log ( resolution instanceof Array ? resolution .join ( '\n' ) : resolution );
+case 'undefined':
+
+break;
+
+case 'object':
+
+if ( resolution instanceof Array )
+console .log ( resolution .join ( '\n' ) );
+
+else
+for ( const output in resolution )
+console .log ( output, resolution [ output ] );
+
+break;
+
+case 'function':
+
+this .processor = resolution;
+
+break;
+
+default:
+
+console .log ( resolution );
+
+}
 
 } catch ( error ) {
 
@@ -64,7 +91,7 @@ console .error ( error );
 
 }
 
-this .shell .prompt ();
+this .prompt ();
 
 if ( this .resolve )
 this .resolve ();
@@ -78,7 +105,7 @@ return this .shell .close ();
 
 this .synthesizer .kill ();
 
-this .shell .prompt ();
+this .prompt ();
 
 };
 
@@ -87,7 +114,7 @@ async $score () {
 if ( this .synthesizer )
 throw "Synthesizer is already playing";
 
-await writeFile ( this .$project + '.sco', this .$ [ Symbol .for ( 'director' ) ] ( 'score' ), 'utf8' );
+await writeFile ( this .$project + '.sco', $ [ Symbol .for ( 'director' ) ] ( 'score' ), 'utf8' );
 
 this .synthesizer = spawn ( 'csound', [
 
@@ -116,7 +143,7 @@ return resolve ( "Okay" )
 
 };
 
-async $nota ( path ) {
+async $read ( $, path ) {
 
 for ( const line of await readFile ( path, 'utf8' ) .then (
 
@@ -126,9 +153,19 @@ file => file .split ( '\n' )
 
 ) ) {
 
-await this .$ ( Symbol .for ( 'enter' ), line );
+await $ ( Symbol .for ( 'enter' ), line );
 
 }
+
+};
+
+prompt () {
+
+const prompt = this .processor ( Symbol .for ( 'prompt' ) );
+
+this .shell .setPrompt ( ( typeof prompt === 'string' ? prompt : '' ) + ': ' );
+
+this .shell .prompt ();
 
 };
 

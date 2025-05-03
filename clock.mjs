@@ -2,35 +2,23 @@ export default class Clock extends Map {
 
 measure = 1;
 
-get $measure () {
+$measure ( $, measure = this .measure ) {
 
-return this .measure;
+if ( isNaN ( measure = parseFloat ( measure ) ) || measure <= 0 )
+throw "Clock measure is required to be a positive number";
 
-};
-
-set $measure ( measure ) {
-
-if ( isNaN ( measure = parseFloat ( measure ) ) )
-throw "Not a number";
-
-this .$ ( 'score', 'v', this .measure = measure );
+return this .measure = measure;
 
 };
 
 cursor = 0;
 
-get $cursor () {
+$cursor ( $, cursor = this .cursor ) {
 
-return this .cursor;
+if ( isNaN ( cursor = parseInt ( cursor ) ) || cursor < 0 )
+throw "Clock cursor is required to be an integer >= 0";
 
-};
-
-set $cursor ( cursor ) {
-
-if ( isNaN ( cursor = parseInt ( cursor ) ) )
-throw "Not a number";
-
-this .$ ( 'score', 'b', this .cursor = cursor );
+return this .cursor = cursor;
 
 };
 
@@ -40,38 +28,20 @@ return this .measure * this .cursor
 
 };
 
-mark = 'zero';
-
-get $mark () {
-
-return this .mark;
-
-};
-
-set $mark ( mark ) {
-
-if ( ! this .has ( mark ) )
-this .set ( mark, this .cursor );
-
-this .$ .cursor = this .get ( mark );
-
-};
-
 tempo = {};
 
-get $tempo () {
+$tempo ( $, tempo ) {
 
+if ( tempo === undefined )
 return Object .keys ( this .tempo ) .map (
 
 cursor => `${ this .measure * cursor } ${ this .tempo [ cursor ] }`
 
 );
 
-};
-
-set $tempo ( tempo ) {
-
 this .tempo [ this .cursor ] = parseFloat ( tempo );
+
+return $ .tempo ();
 
 };
 

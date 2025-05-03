@@ -5,7 +5,7 @@ import type from './data/type.mjs';
 import Channels from './channels.mjs';
 import ZeroDBFS from './0dbfs.mjs';
 
-export default class Orchestra extends Map {
+export default class Setup extends Map {
 
 $_director () {
 

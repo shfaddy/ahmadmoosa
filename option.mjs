@@ -1,6 +1,6 @@
-export default class Options extends Array {
+export default class Option extends Array {
 
-$_director ( ... argv ) {
+$_director ( $, ... argv ) {
 
 switch ( argv .length ) {
 

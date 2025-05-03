@@ -7,9 +7,6 @@ constructor ( scenario, player = this ) {
 this .play = new Proxy ( typeof ( this .scenario = scenario ) === 'function' ? scenario : function Scenarist () {}, this );
 this .player = player;
 
-if ( typeof this .scenario === 'object' )
-Object .defineProperty ( this .scenario, '$', { value: this .play } );
-
 if ( typeof this .scenario ?.$_producer === 'function' )
 this .play ( Symbol .for ( 'producer' ) );
 
@@ -17,11 +14,19 @@ this .play ( Symbol .for ( 'producer' ) );
 
 apply ( scenario, _, argv ) {
 
+if ( argv [ 0 ] ?.[ Scenarist .#stamp ] === Scenarist .#stamp )
+argv .shift ();
+
 if ( scenario === this .scenario )
-return Reflect .apply ( this .scenario, this .player .scenario, argv );
+return Reflect .apply ( this .scenario, this .player .scenario, [
+
+this .player .play,
+... argv
+
+] );
 
 if ( ! argv .length )
-return typeof this .scenario === 'object' ? this .play ( Symbol .for ( 'director' ) ) : this .scenario;
+return typeof this .scenario === 'object' ? this .play ( Symbol .for ( 'director' ) ) : this .play;
 
 const cue = argv .shift ();
 let resolution = this .play [ cue ];
@@ -39,9 +44,14 @@ return argv .length ? this .play ( ... argv ) : resolution;
 
 };
 
+static #stamp = Symbol ( 'stamp' );
+
 plot = new Map;
 
 get ( _, cue, __, ... argv ) {
+
+if ( cue === Scenarist .#stamp )
+return Scenarist .#stamp;
 
 let direction = typeof cue === 'symbol' ? '$_' + Symbol .keyFor ( cue ) : '$' + cue;
 

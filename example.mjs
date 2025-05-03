@@ -2,13 +2,13 @@ import Scenarist from './scenarist.mjs';
 
 Scenarist ( new class {
 
-$hello ( ... argv ) {
+$hello ( $, ... argv ) {
 
-this .$ .profile = { $name: argv .join ( ' ' ) };
+$ .profile = { $name: argv .join ( ' ' ) };
 
-console .log ( 'hello', this .$ .profile .name );
+console .log ( 'hello', $ .profile .name );
 
-this .$ .ask ();
+$ .ask ();
 
 };
 

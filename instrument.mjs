@@ -1,20 +1,20 @@
 import Controller from './controller.mjs';
-import Phone from './phone.mjs';
 
 export default class Instrument {
 
 constructor ( details ) { Object .assign ( this, details ) };
 
-instance = 0;
+#instance = 0;
 
-phone () {
+instance () {
 
-return new Phone ( {
+return ++this .#instance % 10 === 0 ? ++this .#instance : this .#instance;
 
-instrument: `${ this .number }.${ ++this .instance % 10 === 0 ? ++this .instance : this .instance }`,
-$controller: new Controller ( this .controller )
+};
 
-} );
+controller () {
+
+return new Controller ( this .controller );
 
 };
 
