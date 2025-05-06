@@ -90,7 +90,8 @@ return resolution;
 
 set ( _, cue, argv, __ ) {
 
-return this .get ( _, cue, __, isNaN ( argv ) ? argv : parseFloat ( argv ) );
+this .get ( _, cue, __, isNaN ( argv ) ? argv : parseFloat ( argv ) );
+return true;
 
 };
 

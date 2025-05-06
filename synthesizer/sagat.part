@@ -1,0 +1,30 @@
+instr sagat
+
+iSwing random 0, 127
+
+if iSwing > p4 then
+
+aNote subinstr "_sagat"
+
+aNote clip aNote, 1, 0dbfs
+
+chnmix aNote * p5, "left"
+chnmix aNote * p6, "right"
+
+endif
+
+endin
+
+instr _sagat
+
+iRhythm random 3, 6
+p3 /= 2^int ( iRhythm )
+
+iDetune random 0, 25
+iDetune init cent ( iDetune )
+
+aNote tambourine 1, p3, 256, .5, .5, 2100 * iDetune, 5100 * iDetune, 7100 * iDetune
+
+out aNote
+
+endin

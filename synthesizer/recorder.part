@@ -1,0 +1,9 @@
+instr recorder
+
+aRecording inch p4
+
+SRecording sprintf "recording.%d.wav", p5
+
+fout SRecording, -1, aRecording
+
+endin

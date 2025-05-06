@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import AhmadMoosa from './index.mjs';
 import Scenarist from './scenarist.mjs';
 import { createInterface } from 'node:readline';
@@ -25,10 +27,10 @@ this .shell = createInterface ( { input, output } )
 .on ( 'line', line => $ ( Symbol .for ( 'process' ), line ) )
 .on ( 'SIGINT', () => $ ( Symbol .for ( 'interrupt' ) ) );
 
-this .prompt ();
-
 if ( argv .length )
-$ [ Symbol .for ( 'enter' ) ] ( ... argv );
+$ [ Symbol .for ( 'process' ) ] ( argv .join ( ' ' ) );
+
+this .prompt ();
 
 };
 
@@ -42,14 +44,15 @@ this .shell .write ( argv .join ( ' ' ) + '\n' );
 
 } );
 
-delete this .resolve;
-
 };
 
-async $_process ( $, line ) {
+async $_process ( $, line, print ) {
 
 if ( this .synthesizer )
 return false;
+
+if ( print === true )
+console .log ( line );
 
 try {
 
@@ -109,7 +112,7 @@ this .prompt ();
 
 };
 
-async $score () {
+async $play ( $ ) {
 
 if ( this .synthesizer )
 throw "Synthesizer is already playing";
@@ -119,6 +122,7 @@ await writeFile ( this .$project + '.sco', $ [ Symbol .for ( 'director' ) ] ( 's
 this .synthesizer = spawn ( 'csound', [
 
 `${ this .$directory }/index.csd`,
+`--omacro:directory=${ process .cwd () }`,
 `--smacro:score=${ this .$project }.sco`
 
 ], {
@@ -145,21 +149,20 @@ return resolve ( "Okay" )
 
 async $read ( $, path ) {
 
-for ( const line of await readFile ( path, 'utf8' ) .then (
+const file = await readFile ( path, 'utf8' ) .then (
 
 file => file .split ( '\n' )
 .map ( line => line .trim () )
 .filter ( line => line .length )
 
-) ) {
+);
 
-await $ ( Symbol .for ( 'enter' ), line );
-
-}
+for ( const line of file )
+await $ ( Symbol .for ( 'process' ), line, true );
 
 };
 
-prompt () {
+prompt ( $ ) {
 
 const prompt = this .processor ( Symbol .for ( 'prompt' ) );
 

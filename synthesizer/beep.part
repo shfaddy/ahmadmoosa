@@ -1,0 +1,17 @@
+instr beep
+
+iAttack init 1/32
+iDecay init iAttack
+iSustain init 1/16
+iRelease init 1/16
+
+p3 init iAttack + iDecay + iRelease
+
+aEnvelope adsr iAttack, iDecay, iSustain, iRelease
+
+aNote poscil aEnvelope, cpsmidinn ( p4 )
+
+chnmix aNote * p5, "left"
+chnmix aNote * p6, "right"
+
+endin

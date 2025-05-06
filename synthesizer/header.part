@@ -6,6 +6,8 @@ nchnls = 2
 giStrikeFT ftgen 0, 0, 256, 1, "prerequisites/marmstk1.wav", 0, 0, 0
 giVibratoFT ftgen 0, 0, 128, 10, 1
 
-#define parameters #iDuration, iKey, iLeft, iRight, iAttack, iDecay, iRelease, iShift, iSweep, iSustain passign 3#
-
-#include "synthesizer/sub.part"
+#include "synthesizer/recorder.part"
+#include "synthesizer/beep.part"
+#include "synthesizer/tubluh.part"
+#include "synthesizer/claps.part"
+#include "synthesizer/sagat.part"
