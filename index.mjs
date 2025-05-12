@@ -1,155 +1,45 @@
+import Sound from './sound.mjs';
+import Calculator from './calculator.mjs';
+
 export default class AhmadMoosa extends Array {
+
+constructor ( path = '.' ) {
+
+super ();
+
+this .$_director = new Sound ( path );
+
+this .calculator = this [ '$#' ] = new Calculator ( {
+
+x: 13,
+y: 23,
+sum: '#x + #y'
+
+} );
+
+};
+
+introduced = false;
+
+$_prompt () {
+
+if ( ! this .introduced )
+return this .introduced = true, `Hi there, this is Shaikh Faddy's Ahmad Moosa!
+All I can do in life is drumming for you, how may I assist?`;
+
+};
 
 $tempo = 112.5;
 $measure = 4;
 $steps = this .$measure;
 $duration = 3600;
 
-sound = new Map;
-
-$sound ( $, sound = this .sound .on ) {
-
-if ( sound === undefined )
-throw "No sound is designed yet";
-
-if ( ! this .sound .has ( sound ) )
-this .sound .set ( sound, new this .constructor .Sound ( sound ) );
-
-this .$_director = this .sound .get ( sound );
-
-return this .sound .on = sound;
-
-};
-
-static Sound = class {
-
-#kit = [
-
-'dom', 'tak', 'sak', 'sik',
-'claps', 'sagat',
-'beep',
-'recorder'
-
-];
-
-$_producer ( $ ) {
-
-for ( const instrument of this .#kit )
-$ [ instrument ] = Object .defineProperty ( new this .constructor .Instrument, 'name', { value: instrument } );
-
-};
-
-$note ( $, ... argv ) {
-
-const score = [];
-
-for ( const instrument of this .#kit ) {
-
-const note = $ [ instrument ] .note ( ... argv );
-
-if ( note )
-score .push ( note );
-
-}
-
-return score .join ( '\n' );
-
-};
-
-$_director ( $ ) {
-
-return Object .keys ( this )
-.map ( direction => direction .slice ( 1 ) )
-.map (
-
-instrument => `${ instrument } ${ $ ( instrument ) .join ( ' ' ) }`
-
-);
-
-};
-
-static Instrument = class {
-
-$switch = 'off';
-
-$unison = 1;
-$delay = 0;
-
-$length = '1/4';
-$p = new this .constructor .Parameters;
-
-$note ( $, step = 0 ) {
-
-if ( $ .switch === 'on' )
-return [
-
-`{ ${ $ .unison } unison`,
-
-[
-
-`i "${ this .name }"`,
-`[$measure + ${ step } + $unison * ${ $ .delay }]`,
-`[${ $ .length }]`,
-... Object .values ( $ .p () )
-
-] .join ( ' ' ),
-
-'}'
-
-] .join ( '\n' );
-
-};
-
-$_director ( $ ) {
-
-return [ $ .key, $ .left, $ .right ];
-
-};
-
-static Parameters = class Parameters extends Map {
-
-$_director ( $, key, value ) {
-
-if ( key === undefined )
-return $ .list ();
-
-if ( value === undefined )
-
-if ( ! this .has ( key ) )
-throw "Unknown parameter";
-
-else
-return this .get ( key );
-
-this .set ( key, isNaN ( value ?.[ 0 ] ) ? `"${ value }"` : `[${ value }]` );
-
-return $ ( key );
-
-};
-
-$list ( $ ) {
-
-const list = {};
-
-for ( const [ key, value ] of this )
-list [ key ] = value;
-
-return list;
-
-};
-
-};
-
-};
-
-};
-
 $on ( $, ... argv ) {
 
 if ( ! argv .length )
 return this .length = $ .steps, this .join ( '\n' );
 
-this [ parseInt ( argv .shift () ) ] = $ .sound ();
+this [ parseInt ( argv .shift () ) ] = $ ( 'kit' );
 
 return $ .on ( ... argv );
 
@@ -171,12 +61,11 @@ return $ .on ();
 
 };
 
-$format ( $, increment = 2 ) {
+$fill ( $, increment = 2 ) {
 
 for ( let step = 0; step < this .length; step += increment )
-
 if ( this [ step ] === undefined )
-this [ step ] = $ .sound ();
+$ .on ( step );
 
 return $ .on ();
 
@@ -184,25 +73,30 @@ return $ .on ();
 
 $score ( $ ) {
 
-return [
+const score = $ [ Symbol .for ( 'director' ) ] .setup .score;
+const kit = $ ( 'kit' );
 
-`t 0 ${ $ .tempo }`,
-`v ${ $ .measure }`,
-`{ ${ $ .duration } measure`,
+score .clear ();
 
-... this .map (
+score ( 't 0', $ .tempo );
+score ( 'v', $ .measure );
+score ( '{', $ .duration, 'measure' );
 
-( sound, step ) => {
+this .forEach (
 
-$ .sound ( sound );
+( kit, step ) => {
 
-return $ ( 'note', step / this .length );
+$ ( 'kit', kit );
 
-} ),
+score ( $ ( 'note', step / this .length ) );
 
-'}'
+} );
 
-] .join ( '\n\n' );
+score ( '}' );
+
+$ ( 'kit', kit );
+
+return score ();
 
 };
 

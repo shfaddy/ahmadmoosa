@@ -10,18 +10,13 @@ import { parse } from 'node:path';
 
 Scenarist ( new class {
 
-$_director = new AhmadMoosa;
-
-$project = '';
-$directory = parse ( new URL ( import .meta .url ) .pathname ) .dir
+$_director = new AhmadMoosa ( process .cwd () );
 
 constructor ( ... argv ) { this .argv = argv };
 
-async $_producer ( $ ) {
+$_producer ( $ ) {
 
 const { argv } = this;
-
-this .processor = $;
 
 this .shell = createInterface ( { input, output } )
 .on ( 'line', line => $ ( Symbol .for ( 'process' ), line ) )
@@ -30,19 +25,7 @@ this .shell = createInterface ( { input, output } )
 if ( argv .length )
 $ [ Symbol .for ( 'process' ) ] ( argv .join ( ' ' ) );
 
-this .prompt ();
-
-};
-
-async $_enter ( $, ... argv ) {
-
-await new Promise ( resolve => {
-
-this .resolve = resolve;
-
-this .shell .write ( argv .join ( ' ' ) + '\n' );
-
-} );
+$ [ Symbol .for ( 'prompt' ) ] ();
 
 };
 
@@ -56,8 +39,8 @@ console .log ( line );
 
 try {
 
-const argv = line .trim () .split ( /\s+/ );
-const resolution = await this .processor ( ... argv );
+const argv = ( line = line .trim () ) .length ? line .split ( /\s+/ ) : [];
+const resolution = await $ ( ... argv );
 
 switch ( typeof resolution ) {
 
@@ -78,7 +61,7 @@ break;
 
 case 'function':
 
-this .processor = resolution;
+$ [ Symbol .for ( 'director' ) ] = resolution;
 
 break;
 
@@ -94,36 +77,39 @@ console .error ( error );
 
 }
 
-this .prompt ();
+$ [ Symbol .for ( 'prompt' ) ] ();
 
 if ( this .resolve )
 this .resolve ();
 
 };
 
-$_interrupt () {
+$_interrupt ( $ ) {
 
 if ( ! this .synthesizer )
 return this .shell .close ();
 
 this .synthesizer .kill ();
 
-this .prompt ();
+$ [ Symbol .for ( 'prompt' ) ] ();
 
 };
 
-async $play ( $ ) {
+async $yallah ( $ ) {
 
 if ( this .synthesizer )
 throw "Synthesizer is already playing";
 
-await writeFile ( this .$project + '.sco', $ [ Symbol .for ( 'director' ) ] ( 'score' ), 'utf8' );
+const path = 'work.csd';
+
+$ ( 'score' );
+
+await writeFile ( path, $ ( 'setup', 'document' ), 'utf8' );
 
 this .synthesizer = spawn ( 'csound', [
 
-`${ this .$directory }/index.csd`,
+path,
 `--omacro:directory=${ process .cwd () }`,
-`--smacro:score=${ this .$project }.sco`
 
 ], {
 
@@ -162,11 +148,11 @@ await $ ( Symbol .for ( 'process' ), line, true );
 
 };
 
-prompt ( $ ) {
+$_prompt ( $ ) {
 
-const prompt = this .processor ( Symbol .for ( 'prompt' ) );
+const prompt = $ [ Symbol .for ( 'director' ) ] ( Symbol .for ( 'prompt' ) );
 
-this .shell .setPrompt ( ( typeof prompt === 'string' ? prompt : '' ) + ': ' );
+this .shell .setPrompt ( ( typeof prompt === 'string' ? prompt + '\n' : '' ) + ': ' );
 
 this .shell .prompt ();
 
