@@ -1,13 +1,22 @@
 import Setup from './setup.mjs';
 import Kit from './kit.mjs';
+import Calculator from './calculator.mjs';
 
 export default class Sound extends Set {
 
-constructor ( path = '.' ) {
+constructor ( details ) {
 
 super ();
 
-this .$setup = new Setup ( path );
+this .path = typeof details ?.path === 'string' ? details .path : '.';
+this .calculator = details ?.calculator instanceof Calculator ? details .calculator : new Calculator;
+
+this .$setup = new Setup ( {
+
+path: this .path,
+calculator: this .calculator
+
+} );
 
 };
 

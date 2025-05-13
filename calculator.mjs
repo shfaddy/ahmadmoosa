@@ -1,10 +1,21 @@
 export default class Calculator extends Set {
 
-constructor ( descriptor = {} ) {
+$_prompt () {
+
+if ( ! this .binder )
+return this .name ?.length ? [ this .name ] : [];
+
+return [ ... this .binder [ Symbol .for ( 'prompt' ) ] (), this .name ];
+
+};
+
+constructor ( name, descriptor = {}, binder ) {
 
 super ();
 
+this .name = name;
 this .descriptor = descriptor;
+this .binder = binder;
 
 };
 
@@ -24,7 +35,7 @@ return $ .$ ( calculator, ... descriptor .trim () .split ( /\s+/ ) );
 
 default:
 
-return $ [ '#' ] ( calculator, new this .constructor ( descriptor ) );
+return $ [ '#' ] ( calculator, descriptor );
 
 }
 
@@ -49,7 +60,7 @@ if ( ! argv .length )
 return this .result;
 
 if ( ! this .has ( argv [ 0 ] ) )
-throw "Unknown calculator";
+throw `Unknown calculator: '${ argv .shift () }'`;
 
 return $ [ Symbol .for ( 'calculator/' + argv .shift () ) ] ( ... argv );
 
@@ -88,7 +99,16 @@ throw "New calculator name is missing";
 
 const calculator = argv .shift ();
 
-this [ '$_calculator/' + calculator ] = argv [ 0 ] instanceof this .constructor ? argv .shift () : new this .constructor;
+if ( this .has ( calculator ) )
+throw `Calculator #${ calculator } already exists`;
+
+this [ '$_calculator/' + calculator ] = new this .constructor (
+
+calculator,
+typeof argv [ 0 ] === 'object' ? argv .shift () : undefined,
+$
+
+);
 
 this .add ( calculator );
 
@@ -185,6 +205,24 @@ return $ [ '=' ] ( ... this .formula .get ( formula ) );
 this .formula .set ( formula, equation );
 
 return true;
+
+};
+
+$name ( $, name = this .name ) {
+
+return this .name = name;
+
+};
+
+[ '$.' ] ( $, ... argv ) {
+
+return ! argv .length ? $ : $ ( ... argv );
+
+};
+
+[ '$..' ] ( $, ... argv ) {
+
+return ! argv .length ? this .binder || $ : ( this .binder || $ ) ( ... argv );
 
 };
 

@@ -3,17 +3,17 @@ import Calculator from './calculator.mjs';
 
 export default class AhmadMoosa extends Array {
 
-constructor ( path = '.' ) {
+constructor ( details ) {
 
 super ();
 
-this .$_director = new Sound ( path );
+this .path = typeof details ?.path === 'string' ? details .path : '.';
+this .calculator = this [ '$#' ] = details ?.calculator instanceof Calculator ? details .calculator : new Calculator;
 
-this .calculator = this [ '$#' ] = new Calculator ( {
+this .$_director = new Sound ( {
 
-x: 13,
-y: 23,
-sum: '#x + #y'
+path: this .path,
+calculator: this .calculator
 
 } );
 

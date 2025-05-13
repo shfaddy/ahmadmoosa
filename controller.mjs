@@ -2,11 +2,11 @@ import Calculator from './calculator.mjs';
 
 export default class Controller extends Map {
 
-constructor ( controls, calculator = new Calculator ) {
+constructor ( details ) {
 
-super ( Object .entries ( controls ) );
+super ( typeof details ?.controls === 'object' ? Object .entries ( details .controls ) : undefined );
 
-this .$calculator = calculator;
+this .calculator = this .$_calculator = details ?.calculator instanceof Calculator ? details .calculator : new Calculator;
 
 };
 
@@ -20,7 +20,7 @@ control => control .join ( ' = ' )
 
 };
 
-$control ( $, control, value ) {
+$control ( $, control, ... value ) {
 
 if ( control === undefined )
 return $ ();
@@ -28,37 +28,24 @@ return $ ();
 if ( ! this .has ( control ) )
 throw "Unknown control";
 
-if ( value !== undefined )
-this .set ( control, value );
+if ( value .length )
+this .set ( control, value .join ( ' ' ) );
 
 return this .get ( control );
 
 };
 
-$calculate ( $, control, ... equation ) {
-
-if ( control === undefined )
-return $ ();
-
-
-this .set ( control, equation );
-
-};
-
 $parameters ( $ ) {
 
-return [ ... this ] .map (
+return [ ... this ]
+.map ( ( [ control, value ] ) => {
 
-( [ control, value ] ) => {
-
-if ( value instanceof Array )
-value = $ .calculator ( ... value );
+if ( typeof value === 'string' && value .startsWith ( '# ' ) )
+value = $ [ Symbol .for ( 'calculator' ) ] ( ... value .slice ( 2 ) .split ( ' ' ) );
 
 return isNaN ( `${ value }` [ 0 ] ) ? `"${ value }"` : `[${ value }]`
 
-}
-
-);
+} );
 
 };
 

@@ -5,14 +5,16 @@ import type from './data/type.mjs';
 import Channels from './channels.mjs';
 import ZeroDBFS from './0dbfs.mjs';
 import Score from './score.mjs';
+import Calculator from './calculator.mjs';
 
 export default class Setup extends Map {
 
-constructor ( path = '.' ) {
+constructor ( details ) {
 
 super ();
 
-this .path = path;
+this .path = typeof details ?.path === 'string' ? details .path : '.';
+this .calculator = details ?.calculator instanceof Calculator ? details .calculator : new Calculator;
 
 };
 
@@ -207,7 +209,8 @@ return super .set ( instrument, new Instrument ( {
 
 name,
 number,
-controller
+controller,
+calculator: this .calculator
 
 } ) );
 
