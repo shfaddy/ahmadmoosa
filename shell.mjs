@@ -10,7 +10,11 @@ import { parse } from 'node:path';
 
 Scenarist ( new class {
 
-$_director = new AhmadMoosa ( process .cwd () );
+$_director = new AhmadMoosa ( {
+
+path: process .cwd ()
+
+} );
 
 constructor ( ... argv ) { this .argv = argv };
 
@@ -23,8 +27,9 @@ this .shell = createInterface ( { input, output } )
 .on ( 'SIGINT', () => $ ( Symbol .for ( 'interrupt' ) ) );
 
 if ( argv .length )
-$ [ Symbol .for ( 'process' ) ] ( argv .join ( ' ' ) );
+$ [ Symbol .for ( 'process' ) ] ( argv .join ( ' ' ) )
 
+else
 $ [ Symbol .for ( 'prompt' ) ] ();
 
 };
@@ -34,7 +39,9 @@ async $_process ( $, line ) {
 if ( this .synthesizer )
 return false;
 
-this .processing = new Promise ( async resolve => {
+const ticket = this .ticket = new Promise ( async resolve => {
+
+let done = false;
 
 try {
 
@@ -70,19 +77,22 @@ console .log ( resolution );
 
 }
 
+done = true;
+
 } catch ( error ) {
 
 console .error ( error );
 
 }
 
+resolve ( done );
+
+} );
+
+await ticket;
+
+if ( this .prompt )
 $ [ Symbol .for ( 'prompt' ) ] ();
-
-return resolve ();
-
-} )
-
-await this .processing;
 
 };
 
@@ -145,30 +155,42 @@ file => file .split ( '\n' )
 
 );
 
-const { processing } = this;
+const { ticket } = this;
 
-this .processing = true;
+this .ticket = true;
 
 await $ ( Symbol .for ( 'enter' ), ... file );
 
-this .processing = processing;
+this .ticket = ticket;
 
 };
 
 async $_enter ( $, ... file ) {
 
 if ( ! file .length )
-return;
+return this .prompt = true;
+
+this .prompt = false;
 
 const line = file .shift ();
 
-await this .processing;
+if ( ! await this .ticket ) {
+
+this .prompt = true;
+
+throw "Couldn't complete reading nota";
+
+}
+
+$ [ Symbol .for ( 'prompt' ) ] ();
 
 this .shell .write ( line + '\n' );
 
 return $ [ Symbol .for ( 'enter' ) ] ( ... file );
 
 };
+
+prompt = true;
 
 $_prompt ( $ ) {
 
