@@ -29,13 +29,12 @@ $ [ Symbol .for ( 'prompt' ) ] ();
 
 };
 
-async $_process ( $, line, print ) {
+async $_process ( $, line ) {
 
 if ( this .synthesizer )
 return false;
 
-if ( print === true )
-console .log ( line );
+this .processing = new Promise ( async resolve => {
 
 try {
 
@@ -79,8 +78,11 @@ console .error ( error );
 
 $ [ Symbol .for ( 'prompt' ) ] ();
 
-if ( this .resolve )
-this .resolve ();
+return resolve ();
+
+} )
+
+await this .processing;
 
 };
 
@@ -143,8 +145,28 @@ file => file .split ( '\n' )
 
 );
 
-for ( const line of file )
-await $ ( Symbol .for ( 'process' ), line, true );
+const { processing } = this;
+
+this .processing = true;
+
+await $ ( Symbol .for ( 'enter' ), ... file );
+
+this .processing = processing;
+
+};
+
+async $_enter ( $, ... file ) {
+
+if ( ! file .length )
+return;
+
+const line = file .shift ();
+
+await this .processing;
+
+this .shell .write ( line + '\n' );
+
+return $ [ Symbol .for ( 'enter' ) ] ( ... file );
 
 };
 
