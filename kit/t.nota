@@ -1,0 +1,16 @@
+read c.nota
+
+on 0 2
+
+kit F
+
+phone bow/F3 bow
+
+length 1/16
+
+control key 53
+control amplitude 1/8
+
+cut
+
+on 1 3 6

@@ -2,10 +2,11 @@
   "name": "ahmadmoosa",
   "version": "1.0.0",
   "description": "Shaikh Faddy's Ahmad Moosa",
-  "main": "index.mjs",
+  "main": "logic/index.mjs",
+  "exports": "./logic/index.mjs",
   "bin": {
-    "ahmadmoosa": "./shell.mjs",
-    "moosa": "./shell.mjs"
+    "ahmadmoosa": "./index.mjs",
+    "moosa": "./index.mjs"
   },
   "repository": {
     "type": "git",

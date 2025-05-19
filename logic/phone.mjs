@@ -1,6 +1,8 @@
-export default class Phone {
+export default class Phone extends Map {
 
 constructor ( details ) {
+
+super ();
 
 this .instrument = details .instrument;
 this .number = details .number;
@@ -32,14 +34,14 @@ return this .length = length;
 
 };
 
-$note ( $, step = 0 ) {
+$note ( $, step = 0, length = this .length, ... parameters ) {
 
 return [
 
 `i ${ this .number }`,
 `[$measure + ${ step } + ${ $ .delay }]`,
-`[${ $ ( 'length' ) }]`,
-... $ ( 'parameters' )
+`[${ length }]`,
+... parameters .length ? parameters : $ ( 'parameters' )
 
 ] .join ( ' ' );
 

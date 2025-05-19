@@ -1,103 +1,205 @@
-import Sound from './sound.mjs';
-import Calculator from './calculator.mjs';
+#!/usr/bin/env node
 
-export default class AhmadMoosa extends Array {
+import AhmadMoosa from 'ahmadmoosa';
+import Scenarist from './scenarist.mjs';
+import { createInterface } from 'node:readline';
+import { stdin as input, stdout as output } from 'node:process';
+import { readFile, writeFile } from 'node:fs/promises';
+import { spawn } from 'node:child_process';
+import { parse } from 'node:path';
 
-constructor ( details ) {
+Scenarist ( new class {
 
-super ();
+$_director = new AhmadMoosa ( {
 
-this .path = typeof details ?.path === 'string' ? details .path : '.';
-this .calculator = this [ '$#' ] = details ?.calculator instanceof Calculator ? details .calculator : new Calculator;
-
-this .$_director = new Sound ( {
-
-path: this .path,
-calculator: this .calculator
+path: process .cwd ()
 
 } );
 
-};
+constructor ( ... argv ) { this .argv = argv };
 
-introduced = false;
+$_producer ( $ ) {
 
-$_prompt () {
+const { argv } = this;
 
-if ( ! this .introduced )
-return this .introduced = true, `Hi there, this is Shaikh Faddy's Ahmad Moosa!
-All I can do in life is drumming for you, how may I assist?`;
+this .shell = createInterface ( { input, output } )
+.on ( 'line', line => $ ( Symbol .for ( 'process' ), line ) )
+.on ( 'SIGINT', () => $ ( Symbol .for ( 'interrupt' ) ) );
 
-};
+if ( argv .length )
+$ [ Symbol .for ( 'process' ) ] ( argv .join ( ' ' ) )
 
-$tempo = 112.5;
-$measure = 4;
-$steps = this .$measure;
-$duration = 3600;
-
-$on ( $, ... argv ) {
-
-if ( ! argv .length )
-return this .length = $ .steps, this .join ( '\n' );
-
-this [ parseInt ( argv .shift () ) ] = $ ( 'kit' );
-
-return $ .on ( ... argv );
+else
+$ [ Symbol .for ( 'prompt' ) ] ();
 
 };
 
-$cut ( $, cut = 2 ) {
+async $_process ( $, line ) {
 
-const pattern = this .splice ( 0 );
+if ( this .synthesizer )
+return false;
 
-this .$steps = this .length = pattern .length * ( cut = parseFloat ( cut ) );
+const ticket = this .ticket = new Promise ( async resolve => {
 
-pattern .forEach (
+let done = false;
 
-( instrument, step ) => ( this [ step * cut ] = instrument )
+try {
+
+const argv = ( line = line .trim () ) .length ? line .split ( /\s+/ ) : [];
+const resolution = await $ ( ... argv );
+
+switch ( typeof resolution ) {
+
+case 'undefined':
+
+break;
+
+case 'object':
+
+if ( resolution instanceof Array )
+console .log ( resolution .join ( '\n' ) );
+
+else
+for ( const output in resolution )
+console .log ( output, resolution [ output ] );
+
+break;
+
+case 'function':
+
+$ [ Symbol .for ( 'director' ) ] = resolution;
+
+break;
+
+default:
+
+console .log ( resolution );
+
+}
+
+done = true;
+
+} catch ( error ) {
+
+console .error ( error );
+
+}
+
+resolve ( done );
+
+} );
+
+await ticket;
+
+if ( this .prompt )
+$ [ Symbol .for ( 'prompt' ) ] ();
+
+};
+
+$_interrupt ( $ ) {
+
+if ( ! this .synthesizer )
+return this .shell .close ();
+
+this .synthesizer .kill ();
+
+$ [ Symbol .for ( 'prompt' ) ] ();
+
+};
+
+async $yallah ( $ ) {
+
+if ( this .synthesizer )
+throw "Synthesizer is already playing";
+
+const path = 'work.csd';
+
+$ ( 'score' );
+
+await writeFile ( path, $ ( 'setup', 'document' ), 'utf8' );
+
+this .synthesizer = spawn ( 'csound', [
+
+path,
+`--omacro:directory=${ process .cwd () }`,
+
+], {
+
+stdio: 'inherit'
+
+} );
+
+return await new Promise (
+
+( resolve, reject ) => this .synthesizer .on ( 'exit',
+
+code => {
+
+delete this .synthesizer;
+
+return resolve ( "Okay" )
+
+} )
 
 );
 
-return $ .on ();
+};
+
+async $read ( $, path ) {
+
+const file = await readFile ( path, 'utf8' ) .then (
+
+file => file .split ( '\n' )
+.map ( line => line .trim () )
+.filter ( line => line .length )
+
+);
+
+const { ticket } = this;
+
+this .ticket = true;
+
+await $ ( Symbol .for ( 'enter' ), ... file );
+
+this .ticket = ticket;
 
 };
 
-$fill ( $, increment = 2 ) {
+async $_enter ( $, ... file ) {
 
-for ( let step = 0; step < this .length; step += increment )
-if ( this [ step ] === undefined )
-$ .on ( step );
+if ( ! file .length )
+return this .prompt = true;
 
-return $ .on ();
+this .prompt = false;
 
-};
+const line = file .shift ();
 
-$score ( $ ) {
+if ( ! await this .ticket ) {
 
-const score = $ [ Symbol .for ( 'director' ) ] .setup .score;
-const kit = $ ( 'kit' );
+this .prompt = true;
 
-score .clear ();
+throw "Couldn't complete reading nota";
 
-score ( 't 0', $ .tempo );
-score ( 'v', $ .measure );
-score ( '{', $ .duration, 'measure' );
+}
 
-this .forEach (
+$ [ Symbol .for ( 'prompt' ) ] ();
 
-( kit, step ) => {
+this .shell .write ( line + '\n' );
 
-$ ( 'kit', kit );
-
-score ( $ ( 'note', step / this .length ) );
-
-} );
-
-score ( '}' );
-
-$ ( 'kit', kit );
-
-return score ();
+return $ [ Symbol .for ( 'enter' ) ] ( ... file );
 
 };
 
+prompt = true;
+
+$_prompt ( $ ) {
+
+const prompt = $ [ Symbol .for ( 'director' ) ] ( Symbol .for ( 'prompt' ) );
+
+this .shell .setPrompt ( ( typeof prompt === 'string' ? prompt + '\n' : '' ) + ': ' );
+
+this .shell .prompt ();
+
 };
+
+} ( ... process .argv .slice ( 2 ) ) );

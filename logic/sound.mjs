@@ -28,7 +28,7 @@ throw "No sound kit is in use";
 const location = '$_kit/' + kit;
 
 if ( ! this .has ( kit ) )
-this [ location ] = new Kit ( this .$setup );
+this [ location ] = new Kit ( { setup: this .$setup } );
 
 this .$_director = this [ location ];
 
