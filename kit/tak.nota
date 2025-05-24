@@ -1,0 +1,11 @@
+length 1/64
+
+control amplitude 1
+
+control attack 1/2^8
+control decay 1/2^6
+control sustain 1/2^4
+control release 1/^4
+
+control low 7
+control high 12

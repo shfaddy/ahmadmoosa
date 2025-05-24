@@ -28,111 +28,55 @@ gaNote [ p4 ] = 0
 
 endin
 
-instr 2, claps
+giStrikeFT ftgen 0, 0, 256, 1, "prerequisites/marmstk1.wav", 0, 0, 0
+giVibratoFT ftgen 0, 0, 128, 10, 1
+
+instr 2, tubluh
 
 iPChannel init p ( 4 )
 iPAmplitude init p ( 5 )
-iPSwing init p ( 6 )
+iPAttack init p ( 6 )
+iPDecay init p ( 7 )
+iPSustain init p ( 8 )
+iPRelease init p ( 9 )
+iPLow init p ( 10 )
+iPLowSub init p ( 11 )
+iPHigh init p ( 12 )
+iPHighSub init p ( 13 )
+iPGogobell init p ( 14 )
+iPSnatch init p ( 15 )
+
+iPitch random 0, 1
+
+p3 init iPAttack + iPDecay + iPRelease
 
 aNote = 0
 
-iSwing random 0, 127
+aLowSubAmplitude linseg 0, iPAttack, 1, iPDecay, .25, iPRelease, 0
+aLowSubFrequency linseg cpsoct ( iPHigh + iPitch ), iPAttack, cpsoct ( iPLow + iPitch )
 
-if iSwing > iPSwing then
+aLowSub poscil aLowSubAmplitude, aLowSubFrequency
 
-iClaps random 1, 4
+aNote += aLowSub * iPLowSub
 
-SClaps sprintf "claps/%d.wav", int ( iClaps )
+aHighSubAmplitude linseg 0, iPAttack/8, 1, iPDecay/8, iPSustain, iPRelease/8, 0
+aHighSubFrequency linseg cpsoct ( iPHigh + 2 + iPitch ), iPAttack/2, cpsoct ( iPLow + 2 + iPitch )
 
-aLeft, aRight diskin2 SClaps
+aHighSub poscil aHighSubAmplitude, aHighSubFrequency
 
+aNote += aHighSub * iPHighSub
 
-aNote = aLeft + aRight
+aGogobell gogobel 1, cpsoct ( iPLow + iPitch ), .5, .5, giStrikeFT, 6.0, 0.3, giVibratoFT
 
-p3 filelen SClaps
+aNote += aGogobell * iPGogobell
 
-endif
+aSnatchAmplitude linseg 0, iPAttack/8, 1, iPDecay/8, 0
+aSnatchFrequency linseg cpsoct ( iPHigh + 2 + iPitch ), iPAttack/2, cpsoct ( iPHigh + iPitch )
 
-aNote clip aNote, 1, 0dbfs
+aSnatch noise aSnatchAmplitude, 0
+aSnatch butterlp aSnatch, aSnatchFrequency
 
-gaNote [ p4 ] = gaNote [ p4 ] + aNote * iPAmplitude
-
-endin
-
-instr 3, bow
-
-iPChannel init p ( 4 )
-iPAmplitude init p ( 5 )
-iPKey init p ( 6 )
-
-aNote = 0
-
-iEnvelope init 1 / 2^2
-
-if p3 < iEnvelope then
-
-iEnvelope init p3
-
-endif
-
-iAttack init iEnvelope / 2^1
-iDecay init iEnvelope / 2^3
-iRelease init p3 - iAttack - iDecay
-
-iSustain init 1
-
-kAmplitude adsr iAttack, iDecay, iSustain, iRelease
-
-iAmplitude init .99
-iAmplitudeError init .01
-
-kAmplitudeError rspline iAmplitude - iAmplitudeError, iAmplitude + iAmplitudeError, 0, p3
-
-iAttack init iAttack / 2^13
-iDecay init p3 - iAttack - iEnvelope / 2^9
-iRelease init p3 - iAttack - iDecay
-
-iShift init 240
-iFrequency init cpsmidinn ( iPKey )
-
-kFrequency linseg cpsmidinn ( iPKey + iShift ), iAttack, cpsmidinn ( iPKey ), iDecay, cpsmidinn ( iPKey ), iRelease, cpsmidinn ( iPKey + .1 )
-
-kDetune rspline -.25, .25, 0, p3
-
-kFrequency *= cent ( kDetune )
-
-iPressure init 5
-iPressureError init .01
-; 1 - 5
-kPressure rspline iPressure - iPressureError, iPressure + iPressureError, 0, p3
-
-iPosition init .18
-iPositionError init .001
-; .025 - .23
-kPosition rspline iPosition - iPositionError, iPosition + iPositionError, 0, p3
-
-iVibratoFrequency init 1 / 2^8
-iVibratoFrequencyError init 1 / 2^10
-; 0 - 12
-kVibratoFrequency rspline iVibratoFrequency - iVibratoFrequencyError, iVibratoFrequency + iVibratoFrequencyError, 0, p3
-
-iVibratoAmplitude init .025
-iVibratoAmplitudeError init .01
-kVibratoAmplitude rspline iVibratoAmplitude - iVibratoAmplitudeError, iVibratoAmplitude + iVibratoAmplitudeError, 0, p3
-
-aBody wgbow kAmplitude, iFrequency, kPressure, kPosition, kVibratoFrequency, kVibratoAmplitude
-
-aNote += aBody
-
-aZz vco2 kAmplitude, kFrequency, 6
-
-aZz butterlp aZz, kFrequency * 2^0
-
-kFilter linseg 2^13, iAttack, 2^0
-
-aZz butterhp aZz, kFrequency * kFilter / 2^1
-
-aNote += aZz
+aNote += aSnatch * iPSnatch
 
 aNote clip aNote, 1, 0dbfs
 
@@ -148,23 +92,23 @@ t 0 112.5
 
 v 4
 
-{ 3600 measure
+{ 60 measure
 
-i 3.1 [$measure + 0/16 + 0] [1/8] [0] [1/8] [48]
+i 2.1 [$measure + 0/8 + 0] [1/8] [0] [1] [1/32] [1/8] [1/4] [1/2] [5] [1] [8] [1/8] [1/4] [1/4]
 
-i 3.2 [$measure + 2/16 + 0] [1/8] [0] [1/8] [53]
+i 2.2 [$measure + 1/8 + 0] [1/8] [0] [1] [1/2^8] [1/2^6] [1/2^4] [1/^4] [7] [1] [12] [1/8] [1/4] [1/4]
+i 2.3 [$measure + 1/8 + 1/2^9] [1/8] [0] [1] [1/2^8] [1/2^6] [1/2^4] [1/^4] [7] [1] [12] [1/8] [1/4] [1/4]
+i 2.4 [$measure + 1/8 + 1/2^10] [1/8] [0] [1] [1/2^8] [1/2^6] [1/2^4] [1/^4] [7] [1] [12] [1/8] [1/4] [1/4]
 
-i 2.1 [$measure + 4/16 + 0] [1/16] [0] [1/8] [0]
+i 2.2 [$measure + 3/8 + 0] [1/8] [0] [1] [1/2^8] [1/2^6] [1/2^4] [1/^4] [7] [1] [12] [1/8] [1/4] [1/4]
+i 2.3 [$measure + 3/8 + 1/2^9] [1/8] [0] [1] [1/2^8] [1/2^6] [1/2^4] [1/^4] [7] [1] [12] [1/8] [1/4] [1/4]
+i 2.4 [$measure + 3/8 + 1/2^10] [1/8] [0] [1] [1/2^8] [1/2^6] [1/2^4] [1/^4] [7] [1] [12] [1/8] [1/4] [1/4]
 
-i 3.2 [$measure + 6/16 + 0] [1/8] [0] [1/8] [53]
+i 2.1 [$measure + 4/8 + 0] [1/32] [0] [1] [1/32] [1/8] [1/4] [1/2] [5] [1] [8] [1/8] [1/4] [1/4]
 
-i 3.1 [$measure + 8/16 + 0] [1/32] [0] [1/8] [48]
-
-i 2.1 [$measure + 10/16 + 0] [1/16] [0] [1/8] [0]
-
-i 3.2 [$measure + 12/16 + 0] [1/8] [0] [1/8] [53]
-
-i 2.1 [$measure + 14/16 + 0] [1/16] [0] [1/8] [0]
+i 2.2 [$measure + 6/8 + 0] [1/8] [0] [1] [1/2^8] [1/2^6] [1/2^4] [1/^4] [7] [1] [12] [1/8] [1/4] [1/4]
+i 2.3 [$measure + 6/8 + 1/2^9] [1/8] [0] [1] [1/2^8] [1/2^6] [1/2^4] [1/^4] [7] [1] [12] [1/8] [1/4] [1/4]
+i 2.4 [$measure + 6/8 + 1/2^10] [1/8] [0] [1] [1/2^8] [1/2^6] [1/2^4] [1/^4] [7] [1] [12] [1/8] [1/4] [1/4]
 
 }
 

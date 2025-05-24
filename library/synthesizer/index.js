@@ -1,13 +1,13 @@
-import Instrument from './instrument.mjs';
-import Option from './option.mjs';
-import format from './data/format.mjs';
-import type from './data/type.mjs';
-import Channels from './channels.mjs';
-import ZeroDBFS from './0dbfs.mjs';
-import Score from './score.mjs';
-import Calculator from './calculator.mjs';
+import Instrument from './instrument.js';
+import Option from './option.js';
+import format from './data/format.js';
+import type from './data/type.js';
+import Channels from './channels.js';
+import ZeroDBFS from './0dbfs.js';
+import Score from './score.js';
+import Calculator from 'ahmadmoosa/calculator'
 
-export default class Setup extends Map {
+export default class Synthesizer extends Map {
 
 constructor ( details ) {
 
@@ -164,13 +164,13 @@ async get ( instrument ) {
 if ( ! this .has ( instrument ) )
 await this .set ( instrument );
 
-return super .get ( instrument ) .phone ();
+return super .get ( instrument ) .produce ();
 
 };
 
 async set ( instrument ) {
 
-let { controller, header, body, mix } = await import ( `${ this .path }/${ instrument }.instr.mjs` );
+let { controller, header, body, mix } = await import ( `${ this .path }/${ instrument }.instr.js` );
 const code = [];
 const name = instrument .replace ( '/', '_' );
 const number = this .code .length + 2;
@@ -199,7 +199,7 @@ if ( typeof body === 'string' && ( body = body .trim () ) .length )
 code .push ( body );
 
 if ( mix === true )
-code .push ( Setup .mixer );
+code .push ( Synthesizer .mixer );
 
 code .push ( 'endin' );
 

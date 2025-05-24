@@ -1,6 +1,5 @@
-import Phone from './phone.mjs';
-import Controller from './controller.mjs';
-import Calculator from './calculator.mjs';
+import Controller from './controller.js';
+import Calculator from 'ahmadmoosa/calculator';
 
 export default class Instrument extends Map {
 
@@ -17,9 +16,9 @@ this .calculator = details ?.calculator instanceof Calculator ? details .calcula
 
 index = 0;
 
-phone () {
+produce () {
 
-return new Phone ( {
+return {
 
 instrument: this .name,
 number: `${ this .number }.${ ++this .index % 10 === 0 ? ++this .index : this .index }`,
@@ -30,7 +29,7 @@ calculator: this .calculator
 
 } )
 
-} );
+};
 
 };
 

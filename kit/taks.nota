@@ -1,0 +1,16 @@
+musician Abdo tubluh
+
+
+read tak.nota
+
+musician Abdo.2 tubluh
+
+delay 1/2^9
+
+read tak.nota
+
+musician Abdo.3 tubluh
+
+delay 1/2^10
+
+read tak.nota

@@ -1,5 +1,5 @@
-import Sound from './sound.mjs';
-import Calculator from './calculator.mjs';
+import Tarabaiza from 'ahmadmoosa/tarabaiza'
+import Calculator from 'ahmadmoosa/calculator'
 
 export default class AhmadMoosa extends Array {
 
@@ -10,12 +10,25 @@ super ();
 this .path = typeof details ?.path === 'string' ? details .path : '.';
 this .calculator = this [ '$#' ] = details ?.calculator instanceof Calculator ? details .calculator : new Calculator;
 
-this .$_director = new Sound ( {
+this .$_director = new Tarabaiza ( {
 
 path: this .path,
 calculator: this .calculator
 
 } );
+
+};
+
+$_producer ( $ ) {
+
+[
+
+'# tempo = 112.5',
+'# measure = 4',
+'# steps = 4',
+'# duration = 60'
+
+] .forEach ( line => $ [ '#' ] ( ... line .trim () .split ( /\s+/ ) ) );
 
 };
 
@@ -29,22 +42,17 @@ All I can do in life is drumming for you, how may I assist?`;
 
 };
 
-$tempo = 112.5;
-$measure = 4;
-$steps = this .$measure;
-$duration = 3600;
-
 $on ( $, step, length = `1/${ this .length }` ) {
 
 if ( step === undefined )
-return this .map ( ( { kit }, step ) => `${ step } ${ kit }` );
+return this .map ( ( { band }, step ) => `${ step } ${ band }` );
 
 if ( isNaN ( step ) )
 throw "Note step is required to be a number";
 
 this [ parseInt ( Math .abs ( step ) ) ] = {
 
-kit: $ ( 'kit' ),
+band: $ ( 'band' ),
 length
 
 };
@@ -57,7 +65,7 @@ $cut ( $, cut = 2 ) {
 
 const pattern = this .splice ( 0 );
 
-this .$steps = this .length = this .$steps * ( cut = parseFloat ( cut ) );
+this .length = $ [ '#' ] ( 'steps', '*', ( cut = parseFloat ( cut ) ) );
 
 pattern .forEach (
 
@@ -81,22 +89,22 @@ return $ .on ();
 
 $score ( $ ) {
 
-const score = $ [ Symbol .for ( 'director' ) ] .setup .score;
-const kit = $ ( 'kit' );
+const score = $ [ Symbol .for ( 'director' ) ] .synthesizer .score;
+const band = $ ( 'band' );
 
 score .clear ();
 
-score ( 't 0', $ .tempo );
-score ( 'v', $ .measure );
-score ( '{', $ .duration, 'measure' );
+score ( 't 0', $ [ '#' ] ( 'tempo' ) );
+score ( 'v', $ [ '#' ] ( 'measure' ) );
+score ( '{', $ [ '#' ] ( 'duration' ), 'measure' );
 
 this .forEach (
 
 ( note, step ) => {
 
-const { kit, length } = note;
+const { band, length } = note;
 
-$ ( 'kit', kit );
+$ ( 'band', band );
 
 score ( $ ( 'note', step + '/' + this .length, length ) );
 
@@ -104,7 +112,7 @@ score ( $ ( 'note', step + '/' + this .length, length ) );
 
 score ( '}' );
 
-$ ( 'kit', kit );
+$ ( 'band', band );
 
 return score ();
 

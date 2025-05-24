@@ -1,4 +1,4 @@
-import Calculator from './calculator.mjs';
+import Calculator from 'ahmadmoosa/calculator';
 
 export default class Controller extends Map {
 

@@ -2,11 +2,18 @@
   "name": "ahmadmoosa",
   "version": "1.0.0",
   "description": "Shaikh Faddy's Ahmad Moosa",
-  "main": "logic/index.mjs",
-  "exports": "./logic/index.mjs",
+  "type": "module",
+  "main": "logic/index.js",
+  "exports": {
+    ".": "./logic/index.js",
+    "./scenarist": "./library/scenarist.js",
+    "./tarabaiza": "./library/tarabaiza/index.js",
+    "./synthesizer": "./library/synthesizer/index.js",
+    "./calculator": "./library/calculator/index.js"
+  },
   "bin": {
-    "ahmadmoosa": "./index.mjs",
-    "moosa": "./index.mjs"
+    "ahmadmoosa": "./index.js",
+    "moosa": "./index.js"
   },
   "repository": {
     "type": "git",

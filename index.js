@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import AhmadMoosa from 'ahmadmoosa';
-import Scenarist from './scenarist.mjs';
+import Scenarist from 'ahmadmoosa/scenarist';
 import { createInterface } from 'node:readline';
 import { stdin as input, stdout as output } from 'node:process';
 import { readFile, writeFile } from 'node:fs/promises';
@@ -116,7 +116,7 @@ const path = 'work.csd';
 
 $ ( 'score' );
 
-await writeFile ( path, $ ( 'setup', 'document' ), 'utf8' );
+await writeFile ( path, $ ( 'synthesizer', 'document' ), 'utf8' );
 
 this .synthesizer = spawn ( 'csound', [
 

@@ -1,0 +1,18 @@
+musician Farag pluck
+
+control key # c
+control amplitude 1/4
+
+musician Kamal pluck
+
+delay 1/2^9
+
+control key # c + 3
+control amplitude 1/4
+
+musician Beltagi pluck
+
+delay 1/2^8
+
+control key # c + 8
+control amplitude 1/4
