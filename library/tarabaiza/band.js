@@ -1,5 +1,6 @@
 import Musician from './musician.js';
 import Synthesizer from 'ahmadmoosa/synthesizer';
+import Calculator from 'ahmadmoosa/calculator';
 
 export default class Band extends Set {
 
@@ -8,6 +9,7 @@ constructor ( details ) {
 super ();
 
 this .synthesizer = details ?.synthesizer instanceof Synthesizer ? details .synthesizer : new Synthesizer;
+this .$_calculator = details ?.calculator instanceof Calculator ? details .calculator : new Calculator;
 
 };
 
@@ -34,7 +36,12 @@ const location = '$_musician/' + musician;
 if ( ! this .has ( musician ) ) {
 
 instrument = await this .synthesizer .get ( instrument );
-musician = new Musician ( Object .assign ( instrument, { name: musician } ) );
+musician = new Musician ( Object .assign ( instrument, {
+
+name: musician,
+calculator: this .$_calculator
+
+} ) );
 
 this .add ( this .musician = musician .name );
 

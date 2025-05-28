@@ -26,7 +26,9 @@ $_producer ( $ ) {
 '# tempo = 112.5',
 '# measure = 4',
 '# steps = 4',
-'# duration = 60'
+'# duration = 60',
+'# delay = 0',
+'# length = 1'
 
 ] .forEach ( line => $ [ '#' ] ( ... line .trim () .split ( /\s+/ ) ) );
 
@@ -42,22 +44,19 @@ All I can do in life is drumming for you, how may I assist?`;
 
 };
 
-$on ( $, step, length = `1/${ this .length }` ) {
+$on ( $, ... argv ) {
 
-if ( step === undefined )
+if ( ! argv .length )
 return this .map ( ( { band }, step ) => `${ step } ${ band }` );
+
+const step = argv .shift ();
 
 if ( isNaN ( step ) )
 throw "Note step is required to be a number";
 
-this [ parseInt ( Math .abs ( step ) ) ] = {
+this [ parseInt ( Math .abs ( step ) ) ] = $ ( 'band' );
 
-band: $ ( 'band' ),
-length
-
-};
-
-return true;
+return $ .on ( ... argv );
 
 };
 
@@ -100,13 +99,11 @@ score ( '{', $ [ '#' ] ( 'duration' ), 'measure' );
 
 this .forEach (
 
-( note, step ) => {
-
-const { band, length } = note;
+( band, step ) => {
 
 $ ( 'band', band );
 
-score ( $ ( 'note', step + '/' + this .length, length ) );
+score ( $ ( 'note', step + '/' + this .length ) );
 
 } );
 

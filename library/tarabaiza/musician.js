@@ -1,3 +1,5 @@
+import Calculator from 'ahmadmoosa/calculator';
+
 export default class Musician extends Map {
 
 constructor ( details ) {
@@ -8,6 +10,7 @@ this .name = details .name;
 this .instrument = details .instrument;
 this .number = details .number;
 this .$_director = details .controller;
+this .$_calculator = details ?.calculator instanceof Calculator ? details .calculator : new Calculator;
 
 };
 
@@ -45,14 +48,17 @@ return this .length = length;
 
 };
 
-$note ( $, step = 0, length = this .length, ... parameters ) {
+$note ( $, step = 0 ) {
+
+const delay = `(${ $ ( 'delay' ) } * ${ $ [ Symbol .for ( 'calculator' ) ] ( 'delay' ) })`;
+const length = `(${ $ ( 'length' ) } * ${ $ [ Symbol .for ( 'calculator' ) ] ( 'length' ) })`;
 
 return [
 
 `i ${ this .number }`,
-`[$measure + ${ step } + ${ $ ( 'delay' ) }]`,
+`[$measure + ${ step } + ${ delay }]`,
 `[${ length }]`,
-... parameters .length ? parameters : $ ( 'parameters' )
+... $ ( 'parameters' )
 
 ] .join ( ' ' );
 
